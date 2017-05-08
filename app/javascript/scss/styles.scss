@@ -1,0 +1,37 @@
+body {
+  margin: 0;
+  font-family: 'Source Sans Pro', sans-serif;
+}
+
+ul {
+  list-style-type: none;
+}
+
+.container {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+}
+
+.menu {
+  margin: 0;
+  width: 20vw;
+  background-color: #525c65;
+}
+
+.title {
+  margin: 0;
+  padding: 20px;
+  background-color: #1c262f;
+  color: white;
+}
+
+.content {
+  flex: 1;
+  overflow: scroll;
+  background-color: #1c262f;
+}
+
+img {
+  height: 200px;
+}
