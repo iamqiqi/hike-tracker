@@ -10,7 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170506045435) do
+ActiveRecord::Schema.define(version: 20170511061006) do
+
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+  enable_extension "postgis"
+
+  create_table "hiking_routes", force: :cascade do |t|
+    t.text "description", null: false
+    t.geography "check_point", limit: {:srid=>4326, :type=>"st_point", :has_z=>true, :geographic=>true}, null: false
+    t.geometry "path", limit: {:srid=>3785, :type=>"line_string"}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["check_point"], name: "index_hiking_routes_on_check_point", using: :gist
+    t.index ["path"], name: "index_hiking_routes_on_path", using: :gist
+  end
 
   create_table "users", force: :cascade do |t|
     t.string "username", null: false

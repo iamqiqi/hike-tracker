@@ -45,10 +45,10 @@ module.exports = {
     modules: [
       resolve(paths.source),
       resolve(paths.node_modules)
-    ]
+    ],
   },
 
   resolveLoader: {
     modules: [paths.node_modules]
-  }
+  },
 }

@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  descrition: MyText
+  check_point: 
+  path: 
+
+two:
+  descrition: MyText
+  check_point: 
+  path: 

@@ -9,6 +9,10 @@ end
 gem 'pundit'
 
 gem 'jwt'
+
+gem 'activerecord-postgis-adapter'
+
+gem 'aws-sdk'
 #customized gems end here
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
