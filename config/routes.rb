@@ -8,5 +8,7 @@ Rails.application.routes.draw do
 
   resources :hiking_routes, only: [:index, :create, :show, :update, :destroy]
 
+  resources :pictures, only: [:index, :create, :show, :destroy]
+
   get '*path', to: 'application#index'
 end
