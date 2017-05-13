@@ -35,6 +35,7 @@ class HikingRoutesController < ApplicationController
 
   def update
     route = HikingRoute.find(params[:id])
+    authorize route
     route.description = params[:description]
     if route.save
       populated_updated_route = {
@@ -47,5 +48,12 @@ class HikingRoutesController < ApplicationController
     else
       render json: { error: route.errors }
     end
+  end
+
+  def destroy
+    route = HikingRoute.find(params[:id])
+    authorize route
+    route.destroy
+    head status: 200
   end
 end

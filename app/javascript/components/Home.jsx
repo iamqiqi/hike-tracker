@@ -125,16 +125,25 @@ class Home extends React.Component {
       this.map.on('click', 'points', (e) => {
         let popupEl = document.createElement('div');
         popupEl.innerHTML = e.features[0].properties.description;
-        let editButton = document.createElement('button');
-        editButton.innerHTML = 'edit';
-        editButton.addEventListener('click', () => {
-          this.setState({
-            editingStatus: true,
-            editingDescription: e.features[0].properties.description,
-            editingPointId: e.features[0].properties.record_id,
-          })
-        });
-        popupEl.appendChild(editButton);
+        if (e.features[0].properties.record_id) {
+          let editButton = document.createElement('button');
+          editButton.innerHTML = 'edit';
+          editButton.addEventListener('click', () => {
+            this.setState({
+              editingStatus: true,
+              editingDescription: e.features[0].properties.description,
+              editingPointId: e.features[0].properties.record_id,
+            })
+          });
+          popupEl.appendChild(editButton);
+
+          let deleteButton = document.createElement('button');
+          deleteButton.innerHTML = 'Delete';
+          deleteButton.addEventListener('click', () => {
+            this.deletePin(e.features[0].properties.record_id);
+          });
+          popupEl.appendChild(deleteButton);
+        }
 
         const newPopup = new mapboxgl.Popup()
             .setLngLat(e.features[0].geometry.coordinates)
@@ -143,6 +152,16 @@ class Home extends React.Component {
 
         this.openPopups.push(newPopup);
       });
+    });
+  }
+
+  deletePin(id) {
+    fetch(`hiking_routes/${id}?token=${this.props.currentUser.token}`, { method: 'DELETE' })
+    .then(() => {
+      this.getPoints();
+    })
+    .catch((e) => {
+      console.log(e.message);
     });
   }
 
