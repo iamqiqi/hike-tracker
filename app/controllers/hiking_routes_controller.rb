@@ -2,13 +2,18 @@ class HikingRoutesController < ApplicationController
   before_action :lookup_user_by_token
 
   def index
+    puts '====start====='
     user_routes = current_user.hiking_routes
+    puts "======= s ======="
+    puts user_routes
+    puts "======= e ======="
     populated_user_routes = user_routes.map do |route|
       {
         id: route.id,
         lat: route.check_point.lat,
         lng: route.check_point.lon,
-        description: route.description
+        description: route.description,
+        images: route.pictures
       }
     end
     render json: { routes: populated_user_routes }
@@ -54,6 +59,6 @@ class HikingRoutesController < ApplicationController
     route = HikingRoute.find(params[:id])
     authorize route
     route.destroy
-    head status: 200
+    head 204
   end
 end

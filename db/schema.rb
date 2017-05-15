@@ -17,7 +17,7 @@ ActiveRecord::Schema.define(version: 20170512065844) do
   enable_extension "postgis"
 
   create_table "hiking_routes", force: :cascade do |t|
-    t.string "user_id", null: false
+    t.integer "user_id", null: false
     t.text "description", null: false
     t.geography "check_point", limit: {:srid=>4326, :type=>"st_point", :has_z=>true, :geographic=>true}, null: false
     t.geometry "path", limit: {:srid=>3785, :type=>"line_string"}
@@ -28,12 +28,14 @@ ActiveRecord::Schema.define(version: 20170512065844) do
   end
 
   create_table "pictures", force: :cascade do |t|
-    t.string "hiking_route_id", null: false
+    t.integer "hiking_route_id", null: false
     t.text "description"
     t.string "s3_name", null: false
+    t.string "url", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["s3_name"], name: "index_pictures_on_s3_name", unique: true
+    t.index ["url"], name: "index_pictures_on_url", unique: true
   end
 
   create_table "users", force: :cascade do |t|

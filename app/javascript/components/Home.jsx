@@ -27,6 +27,9 @@ class Home extends React.Component {
         lat: 37.7577,
         zoom: 12,
       },
+      imageFile: null,
+      imageUrl: '',
+      awsUrl: null,
     };
     this.map = null;
     this.mapDom = null;
@@ -70,10 +73,14 @@ class Home extends React.Component {
             "record_id": hiking_record.id,
             "title": "Test",
             "icon": "monument",
-            "description": hiking_record.description
+            "description": hiking_record.description,
+            "images": hiking_record.images
           }
         };
       });
+
+      console.log(data);
+
       this.setState({
         ...initialState,
         points,
@@ -132,7 +139,7 @@ class Home extends React.Component {
             this.setState({
               editingStatus: true,
               editingDescription: e.features[0].properties.description,
-              editingPointId: e.features[0].properties.record_id,
+              editingPointId: e.features[0].record_id,
             })
           });
           popupEl.appendChild(editButton);
@@ -143,6 +150,14 @@ class Home extends React.Component {
             this.deletePin(e.features[0].properties.record_id);
           });
           popupEl.appendChild(deleteButton);
+
+          if (e.features[0].properties.images) {
+            let image = document.createElement('img');
+            image.setAttribute('src', JSON.parse(e.features[0].properties.images)[0].url);
+            image.setAttribute('height', '50');
+            image.setAttribute('width', '50');
+            popupEl.appendChild(image);
+          }
         }
 
         const newPopup = new mapboxgl.Popup()
@@ -212,8 +227,15 @@ class Home extends React.Component {
           description,
         }),
       })
-      .then(() => {
-        this.getPoints();
+      .then(res => res.json())
+      .then(data => {
+        this.setState({ editingPointId: data.new_route.id }, () => {
+          if (this.state.imageFile) {
+            this.submitImage();
+          } else {
+            this.getPoints();
+          }
+        });
       })
       .catch((e) => {
         console.log(e.message);
@@ -231,13 +253,50 @@ class Home extends React.Component {
         }),
       })
       .then(() => {
-        this.getPoints();
+        if (this.state.imageFile) {
+          this.submitImage();
+        } else {
+          this.getPoints();
+        }
       })
       .catch((e) => {
         console.log(e.message);
       });
     }
 
+  }
+
+  onFilePick(e) {
+    const reader = new FileReader();
+    const file = e.currentTarget.files[0];
+
+    if (file) {
+      reader.onloadend = () => {
+        this.setState({ imageUrl: reader.result, imageFile: file });
+      }
+      reader.readAsDataURL(file);
+    } else {
+      this.setState({ imageUrl: '', imageFile: null });
+    }
+  }
+
+  submitImage() {
+    fetch('/pictures', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        data: this.state.imageUrl,
+        filename: this.state.imageFile.name,
+        filetype: this.state.imageFile.type,
+        route_id: this.state.editingPointId,
+      }),
+    })
+    .then(res => res.json())
+    .then(data => {
+      this.setState({ awsUrl: data.url }, () => this.getPoints());
+    });
   }
 
   render () {
@@ -253,9 +312,10 @@ class Home extends React.Component {
         <button onClick={() => this.dropPin()}>
           drop pin
         </button>
-        <div id="map" style={{width: '400px', height: '400px',}} ref={ dom => this.mapDom = dom }></div>
+        <div id="map" style={{width: '400px', height: '100px',}} ref={ dom => this.mapDom = dom }></div>
         { this.state.editingStatus &&
           <div>
+
             <div style={{ position: 'relative', width: '300px' }}>
               <input
                 style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, width: '100%', opacity: 0.3 }}
@@ -263,9 +323,12 @@ class Home extends React.Component {
                 onChange={e => this.onFilePick(e)}
               />
               <div style={{ padding: '12px', background: 'green', color: 'white' }}>
-                This is my cooler button {!!this.state.imageFile && this.state.imageFile.name}
+                This is my cooler button
+                {!!this.state.imageFile && this.state.imageFile.name}
               </div>
             </div>
+
+
 
             <form onSubmit={ e => this.savePin(e, this.descriptitonInput.value) }>
               <label>
